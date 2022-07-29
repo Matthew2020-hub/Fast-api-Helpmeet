@@ -1,0 +1,3 @@
+*.env
+*migrations
+*sql_app.db
