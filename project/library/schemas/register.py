@@ -1,4 +1,9 @@
-from pydantic import BaseModel, EmailStr, Field, root_validator
+from pydantic import (
+    BaseModel, 
+    EmailStr, 
+    Field, 
+    root_validator
+)
 from library.dependencies.utils import validate_password
 
 regex = "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*+=]).{8,}$"
@@ -19,7 +24,6 @@ class UserCreate(BaseModel):
 
 class UserPublic(BaseModel):
     full_name: str = Field(..., max_length=50)
-    surname: str = Field(..., max_length=50)
     house_address: str = Field(..., max_length=150)
     estate_name: str = Field(..., max_length=150)
     is_admin: bool
@@ -34,6 +38,7 @@ class EstateCreate(BaseModel):
     estate_addres: str = Field(..., max_length=50)
     country: str = Field(..., max_length=15)
     estate_name: str = Field(..., max_length=150)
+
 
 
 class EstatePublic(BaseModel):

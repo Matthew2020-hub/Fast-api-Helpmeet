@@ -11,7 +11,6 @@ from library.schemas.auth import JWTSchema
 from config import SECRET_KEY, ALGORITHM
 from models.user import User
 
-
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/auth/login/",
     scopes={"base": "For ordinary users", "root": "For super users"},
@@ -52,3 +51,7 @@ async def get_current_user(
         )
 
     return user
+
+
+
+

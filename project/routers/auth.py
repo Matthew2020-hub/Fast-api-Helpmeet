@@ -12,7 +12,6 @@ from library.schemas.register import (
     EstatePublic,
     EstateCreate
 )
-
 from library.schemas.auth import (
     LoginSchema,
     AuthResponse,
@@ -201,7 +200,7 @@ async def forgot_password(data: ForgotPasswordSchema):
         HTTP_401_UNAUTHORIZED if data doesn't match any entry in the DB
     """
     user = await User.get_or_none(email=data.email)
-    if not user:
+    if user is None:
         raise HTTPException(
             detail="User does not exist",
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -292,7 +291,7 @@ async def password_reset(data: PasswordResetSchema, token: str = Path(...)):
 
 
 @router.post(
-    "estate/register/",
+    "/estate/register/",
     response_model= EstatePublic,
     name="auth:estate-registration",
     status_code=status.HTTP_201_CREATED,
