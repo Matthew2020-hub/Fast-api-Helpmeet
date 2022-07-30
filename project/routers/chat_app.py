@@ -19,7 +19,7 @@ from library.dependencies.auth import get_current_user
 from asgiref.sync import sync_to_async
 
 router = APIRouter(prefix="/estate")
-sio: Any = socketio.AsyncServer(async_mode="asgi")
+sio: Any = socketio.AsyncServer(async_mode="asgi", cors_allow_origin="*")
 socket_app = socketio.ASGIApp(sio)
 router.mount("/", socket_app)  # Here we mount socket app to main fastapi app
 
@@ -43,44 +43,24 @@ async def connect(sid, env, auth):
 
 
 
-@sio.on("direct")
-async def direct(sid, msg):
-    print(f"direct {msg}")
-    # we can send message to specific sid
-    await sio.emit("event_name", msg, room=sid)  
-
-
-
-@sio.on("broadcast")
-async def broadcast(sid, msg):
-    print(f"broadcast {msg}")
-    await sio.emit("event_name", msg)  # or send to everyone
-
-
-
-@sio.on("disconnect")
-async def disconnect(sid):
-    print("on disconnect")
-
-
-# communication with orm
-def store_and_return_message(data):
-    data = data
-    if "room_id" in data:
-        room_id = data["room_id"]
-    else:
-        # raise ConnectionRefusedError("Authentication Failed")
-        room_id = "VGTXC7NJY"
-    room = Room.objects.get(room_id=room_id)
-    instance = Message.objects.create(
-        room=room,
-        author=data["author"],
-        content=data["content"],
-        short_id=generate_short_id(),
-    )
-    instance.save()
-    message = message_schema(instance)
-    return message
+# # communication with orm
+# def store_and_return_message(data):
+#     data = data
+#     if "room_id" in data:
+#         room_id = data["room_id"]
+#     else:
+#         # raise ConnectionRefusedError("Authentication Failed")
+#         room_id = "VGTXC7NJY"
+#     room = Room.objects.get(room_id=room_id)
+#     instance = Message.objects.create(
+#         room=room,
+#         author=data["author"],
+#         content=data["content"],
+#         short_id=generate_short_id(),
+#     )
+#     instance.save()
+#     message = message_schema(instance)
+#     return message
 
 
 # listening to a 'message' event from the client
@@ -115,8 +95,8 @@ async def store_and_return_message(data: MessageCreate,
     room = await Room.get(room_id=get_room_user.room_id)
     instance = await Message.create(
         room=room,
-        author=data["author"],
-        content=data["content"],
+        author=current_user,
+        content=data.message,
         short_id=generate_short_id(),
     )
     instance.save()
@@ -134,6 +114,10 @@ async def get_estate_message(estate_name:str = Path(...)):
     messages = await Message.filter(room=get_room).select_related("author")
     if messages:
         return messages
+    raise HTTPException(    
+        status_code=status.HTTP_204_NO_CONTENT,
+            detail="No message is available"
+        )
 
 
 
@@ -147,3 +131,7 @@ async def get_all_messages():
     messages = await Message.all()
     if messages:
         return messages
+    raise HTTPException(    
+        status_code=status.HTTP_204_NO_CONTENT,
+            detail="No message is available"
+        )

@@ -4,11 +4,6 @@ from project.models.base import BaseModel
 from project.library.dependencies.utils import generate_short_id
 from project.models.user import User
 
-
-def generate_short_id(size=9, chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"):
-    return "".join(random.choice(chars) for _ in range(size))
-
-
 class Room(BaseModel):
     user = fields.OneToOneField("models.Estate", on_delete='CASCADE')
     room_id = fields.CharField(

@@ -23,4 +23,5 @@ class Estate(BaseModel):
     estate_country = fields.CharField(max_length=15, unique=True, blank=False)
     public_id = fields.CharField(
         max_length=15, default=generate_short_id, unique=True
-    )
+        )
+        

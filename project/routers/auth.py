@@ -34,7 +34,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     name="auth:register",
     status_code=status.HTTP_201_CREATED,
 )
-async def register(data: UserCreate):
+async def user_register(data: UserCreate):
     """Creates a new user
 
     Registers a user in the database
@@ -79,7 +79,6 @@ async def register(data: UserCreate):
         body=email_body,
         subtype="html"
         )
-
     fm = FastMail(conf)
     await fm.send_message(message)
     return created_user
@@ -222,7 +221,6 @@ async def forgot_password(data: ForgotPasswordSchema):
         body=email_body,
         subtype="html"
         )
-
     fm = FastMail(conf)
     await fm.send_message(message)
     return {"message": f"Password reset link sent to {data.email}"}
@@ -296,15 +294,13 @@ async def password_reset(data: PasswordResetSchema, token: str = Path(...)):
     name="auth:estate-registration",
     status_code=status.HTTP_201_CREATED,
 )
-async def register(
-    data: EstateCreate
-    ):
+async def estate_registration(data: EstateCreate):
     """Creates a new estate
 
     Registers an estate admin object during estate registration
     Returns user details when successfully registered
     Args:
-        data - a pydantic schema that defines the estate registration params
+        data- a pydantic schema that defines the estate registration params
     Returns:
         HTTP_201_CREATED- (estate details as defined in the response model)
     Raises:
@@ -324,5 +320,5 @@ async def register(
         raise HTTPException(
             detail="Estate registration is unsuccessful",
             status_code=status.HTTP_424_FAILED_DEPENDENCY,
-        )
+            )
     return estate_create
