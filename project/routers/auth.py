@@ -45,10 +45,10 @@ async def user_register(data: UserCreate):
         HTTP_201_CREATED (with user details as defined in the response model)
         Sends otp via SMTP as a background task
     Raises:
-        HTTP_400_BAD_REQUEST if user exists or weak password
+        HTTP_400_BAD_REQUEST if user exists
     """
 
-    # Converts user email to lower-case
+    # Converts user email to lower-case to avoid being case sensitive
     valid_email = to_lower_case(data.email)
     email_exist = await User.exists(email=valid_email)
     if email_exist:
@@ -305,13 +305,33 @@ async def estate_registration(data: EstateCreate):
         HTTP_201_CREATED- (estate details as defined in the response model)
     Raises:
         HTTP_424_FAILED_DEPENDENCY- if failure to create an estate instance
+        HTTP_400_BAD_REQUEST- if email or estate name exists
     """
 
     estate_email = data.email
+    # verify that estate-admin email is unique
+    verify_email_exist = await User.filter(email=estate_email).exists()
+    if verify_email_exist:
+        raise HTTPException(
+            detail = "User with this email already exist",
+            status_code = status.HTTP_400_BAD_REQUEST,
+        )
+    # verify that estate name is unique
+    verify_estate_name_exist = await Estate.filter(
+        estate_name=data.estate_name
+        ).exists()
+    if verify_estate_name_exist:
+        raise HTTPException(
+            detail = "User with this email already exist",
+            status_code = status.HTTP_400_BAD_REQUEST,
+        )
     estate_password = data.password
     hashed_password = pwd_context.hash(estate_password)
+    # create estate agent as a user object to permit authentication
     estate_admin_create = await User.create(
-        email=estate_email, hashed_password=hashed_password, is_admin=True
+        email=estate_email, 
+        hashed_password=hashed_password, 
+        is_admin=True
     )
     estate_create = await Estate.create(**data.dict(
         exclude_unset=True, exclude={"estate_email","estate_password"}

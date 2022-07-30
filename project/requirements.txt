@@ -26,4 +26,8 @@ python-jose[cryptography]==3.3.0
 # AWS
 boto3==1.21.42
 
+# mail library
 fastapi-mail==1.1.4
+
+# websocket
+python-socketio==5.5.0

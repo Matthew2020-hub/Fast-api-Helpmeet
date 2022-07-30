@@ -16,7 +16,7 @@ class MessagePublic(BaseModel):
     room_id: str
     author: UserPublic
     short_id: str
-
+    created_at: str
 
 
 def message_schema(data) -> dict:
