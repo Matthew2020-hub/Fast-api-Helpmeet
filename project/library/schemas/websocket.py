@@ -24,6 +24,6 @@ def message_schema(data) -> dict:
         "room_id": data.room.room_id,
         "author": data.author,
         "message": data.content,
-        "timestamp": (data.timestamp).strftime("%a. %I:%M %p"),
+        "timestamp": (data.created_at).strftime("%a. %I:%M %p"),
         "short_id": data.short_id,
     }

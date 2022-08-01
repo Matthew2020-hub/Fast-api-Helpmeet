@@ -15,7 +15,7 @@ from library.schemas.websocket import (
     MessagePublic, 
     message_schema
 )
-from library.dependencies.auth import get_current_user 
+# from library.dependencies.auth import get_current_user 
 from asgiref.sync import sync_to_async
 
 router = APIRouter(prefix="/estate")
@@ -44,23 +44,24 @@ async def connect(sid, env, auth):
 
 
 # # communication with orm
-# def store_and_return_message(data):
-#     data = data
-#     if "room_id" in data:
-#         room_id = data["room_id"]
-#     else:
-#         # raise ConnectionRefusedError("Authentication Failed")
-#         room_id = "VGTXC7NJY"
-#     room = Room.objects.get(room_id=room_id)
-#     instance = Message.objects.create(
-#         room=room,
-#         author=data["author"],
-#         content=data["content"],
-#         short_id=generate_short_id(),
-#     )
-#     instance.save()
-#     message = message_schema(instance)
-#     return message
+async def store_and_return_message(data):
+    data = data
+    if "room_id" in data:
+        room_id = data["room_id"]
+        room = await Room.get_or_none(room_id=room_id)
+        if room is None:
+            raise ConnectionRefusedError("Authentication Failed")
+        instance = await Message.create(
+        room=room,
+        author=data["author"],
+        content=data["content"],
+        short_id=generate_short_id(),
+    )
+        instance.save()
+        message = message_schema(instance)
+        return message
+    else:
+        raise ConnectionRefusedError("Authentication Failed")
 
 
 # listening to a 'message' event from the client
@@ -77,34 +78,8 @@ async def print_message(sid, data):
 
 
 
-@router.post(
-    "/chat/", response_model=MessagePublic, 
-    status_code=status.HTTP_201_CREATED,
-    )
-async def store_and_return_message(data: MessageCreate,
-    current_user =Security(get_current_user, scopes=["base"]),
-    ):
-    estate_name = current_user.estate_name
-    estate = await Estate.get_or_none(estate_name=estate_name)
-    if estate is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User Estate does not exist"
-        )
-    get_room_user = await Room.get(user = estate)
-    room = await Room.get(room_id=get_room_user.room_id)
-    instance = await Message.create(
-        room=room,
-        author=current_user,
-        content=data.message,
-        short_id=generate_short_id(),
-    )
-    instance.save()
-    return instance
-
-
 @router.get(
-    "/chate/messages/{estate_name}",
+    "/chat/messages/{estate_name}",
     status_code=status.HTTP_200_OK,
     response_model=MessagePublic
 )
@@ -118,7 +93,6 @@ async def get_estate_message(estate_name:str = Path(...)):
         status_code=status.HTTP_204_NO_CONTENT,
             detail="No message is available"
         )
-
 
 
 

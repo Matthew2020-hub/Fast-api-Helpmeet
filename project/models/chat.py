@@ -5,7 +5,7 @@ from project.library.dependencies.utils import generate_short_id
 from project.models.user import User
 
 class Room(BaseModel):
-    user = fields.OneToOneField("models.Estate", on_delete='CASCADE')
+    estate = fields.OneToOneField("models.Estate", on_delete='CASCADE')
     room_id = fields.CharField(
         max_length=255, default=generate_short_id(), unique=True
         )
