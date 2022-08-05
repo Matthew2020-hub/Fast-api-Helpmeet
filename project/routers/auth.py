@@ -1,9 +1,12 @@
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, status, Path, HTTPException
-
-# Files, Models, Schemas, Dependencies
+from fastapi import (
+    APIRouter, 
+    status, 
+    Path, 
+    HTTPException
+)
 from models.user import User
 from library.dependencies.utils import to_lower_case
 from library.schemas.register import (
