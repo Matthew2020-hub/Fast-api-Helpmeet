@@ -1,8 +1,7 @@
-import random
 from tortoise import fields
-from project.models.base import BaseModel
-from project.library.dependencies.utils import generate_short_id
-from project.models.user import User
+from models.base import BaseModel
+from library.dependencies.utils import generate_short_id
+from models.user import User
 
 class Room(BaseModel):
     estate = fields.OneToOneField("models.Estate", on_delete='CASCADE')

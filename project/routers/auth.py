@@ -25,7 +25,7 @@ from library.schemas.auth import (
 )
 from config import SECRET_KEY, ALGORITHM, conf
 from fastapi_mail import FastMail, MessageSchema
-from project.models.user import Estate
+from models.user import Estate
 
 router = APIRouter(prefix="/auth")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
