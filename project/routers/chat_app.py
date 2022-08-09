@@ -18,7 +18,7 @@ from library.schemas.websocket import (
 # from library.dependencies.auth import get_current_user 
 from asgiref.sync import sync_to_async
 
-router = APIRouter(prefix="/estate")
+router = APIRouter(prefix="/chat_app")
 sio: Any = socketio.AsyncServer(async_mode="asgi", cors_allow_origin="*")
 socket_app = socketio.ASGIApp(sio)
 router.mount("/", socket_app)  # Here we mount socket app to main fastapi app
