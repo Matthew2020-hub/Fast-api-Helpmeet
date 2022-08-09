@@ -1,5 +1,5 @@
 from tortoise import fields
-from project.models.base import BaseModel
+from models.base import BaseModel
 from pydantic import EmailStr
 from library.dependencies.utils import generate_short_id
 
