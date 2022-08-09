@@ -8,7 +8,10 @@ from fastapi_mail import ConnectionConfig
 
 config = Config(".env")
 
+api_key=config("api_key",  cast=Secret)
 
+cloud_name=config("cloudinary_name",  cast=Secret)
+api_secret=config("api_secret",  cast=Secret)
 TESTING=config("TESTING", cast=bool, default=False)
 DEBUG=config("DEBUG", cast=bool, default=False)
 LIVE=config("LIVE", cast=bool, default=False)
