@@ -6,7 +6,7 @@ from fastapi import (
     Security
 )
 from typing import Any
-from project.models.user import Estate
+from models.user import Estate
 import socketio
 from models.chat import Room, Message
 from library.dependencies.utils import generate_short_id

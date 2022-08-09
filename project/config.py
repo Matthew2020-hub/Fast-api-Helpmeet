@@ -32,9 +32,9 @@ ALGORITHM=config("ALGORITHM", cast=str)
 
 
 conf = ConnectionConfig(
-    MAIL_USERNAME=config("EMAIL_HOST_USER",cast=Secret),
-    MAIL_PASSWORD=config("EMAIL_HOST_PASSWORD",cast=Secret),
-    MAIL_FROM=config("EMAIL_HOST_USER",cast=Secret),
+    MAIL_USERNAME=config("EMAIL_HOST_USER",cast=str),
+    MAIL_PASSWORD=config("EMAIL_HOST_PASSWORD",cast=str),
+    MAIL_FROM=config("EMAIL_HOST_USER",cast=str),
     MAIL_PORT=587,
     MAIL_SERVER="smtp.gmail.com",
     MAIL_FROM_NAME="HELPMEET",
