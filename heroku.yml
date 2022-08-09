@@ -5,4 +5,4 @@ build:
   docker:
     web: project/Dockerfile
 run:
-  web: gunicorn project.asgi
+  web: gunicorn spokane/project
