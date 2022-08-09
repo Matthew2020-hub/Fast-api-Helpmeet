@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from library.database.database import create_start_app_handler
-from project.routers.auth import router
-from project.routers.chat_app import router as routers
+from routers.auth import router
+from routers.chat_app import router as routers
 
 def get_application():
     app = FastAPI()
