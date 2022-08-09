@@ -51,5 +51,3 @@ fastapi-mail==1.1.4
 
 # websocket
 python-socketio==5.5.0
-
-uvicorn==0.16.0
