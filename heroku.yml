@@ -1,3 +1,8 @@
+setup:
+  addons:
+  - plan: heroku-postgresql
 build:
   docker:
     web: project/Dockerfile
+run:
+  web: gunicorn ./project/
