@@ -12,10 +12,10 @@ class Room(BaseModel):
 
 class Message(BaseModel):
     room = fields.ForeignKeyField(
-        Room, related_name="messages", on_delete='CASCADE', null=True
+        "models.Room", related_name="messages", on_delete='CASCADE', null=True
     )
     author = fields.ForeignKeyField(
-        User, related_name="author", on_delete='CASCADE', null=True
+        "models.User", related_name="author", on_delete='CASCADE', null=True
     )
     content = fields.TextField(unique=False, blank=False)
     short_id = fields.CharField(
