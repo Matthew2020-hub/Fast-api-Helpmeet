@@ -16,7 +16,7 @@ class User(BaseModel):
 
 
 class Estate(BaseModel):
-    member = fields.ForeignKeyField("models.User", null=True)
+    member = fields.ForeignKeyField("models.User",on_delete="CASCADE", null=True)
     estate_name = fields.CharField(max_length=200, null=True, blank=False)
     estate_profile_image = fields.CharField(max_length=250, null=True)
     estate_address = fields.CharField(max_length=400, unique=True, blank=False)
