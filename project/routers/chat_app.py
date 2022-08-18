@@ -15,6 +15,7 @@ from library.schemas.websocket import (
     MessagePublic, 
     message_schema
 )
+import uvicorn
 # from library.dependencies.auth import get_current_user 
 from asgiref.sync import sync_to_async
 
@@ -109,3 +110,12 @@ async def get_all_messages():
         status_code=status.HTTP_204_NO_CONTENT,
             detail="No message is available"
         )
+
+
+
+
+
+if __name__ == "__main__":
+    kwargs = {"host": "0.0.0.0", "port": 8000}
+    kwargs.update({"debug": True, "reload": True})
+    uvicorn.run("server:app", **kwargs)
