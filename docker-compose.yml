@@ -10,11 +10,9 @@ services:
     volumes:
       - ../project/
       - .:/code
-    command: uvicorn server:app --reload --workers 1 --host 0.0.0.0 --port 8080
+    command: uvicorn server:app --reload --workers 1 --host 0.0.0.0 
     env_file:
       - ./.env
-    ports:
-      - 8080:8080
     depends_on:
       - db
     restart: "on-failure"
