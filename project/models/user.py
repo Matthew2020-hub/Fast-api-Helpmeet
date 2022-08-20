@@ -21,7 +21,6 @@ class Estate(BaseModel):
     estate_name = fields.CharField(
         max_length=200, 
         null=True, blank=False, 
-        unique=True
         )
     estate_profile_image = fields.CharField(
         max_length=250, 
@@ -29,12 +28,10 @@ class Estate(BaseModel):
         )
     estate_address = fields.CharField(
         max_length=400, 
-        unique=True, 
         blank=False
         )
     estate_country = fields.CharField(
         max_length=15, 
-        unique=True, 
         blank=False
         )
     public_id = fields.CharField(

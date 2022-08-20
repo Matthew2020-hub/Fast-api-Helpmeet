@@ -31,9 +31,9 @@ anyio==3.5.0
 asgiref==3.5.
 email-validator==1.2.1
 fastapi-mail==1.1.4
-
+environ==1.0
 # unit/integration testing
-
+python-jose==3.3.0
 pytest==7.1.1
 pytest-asyncio==0.18.3
 httpx==0.22.0

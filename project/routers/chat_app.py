@@ -11,7 +11,6 @@ import socketio
 from models.chat import Room, Message
 from library.dependencies.utils import generate_short_id
 from library.schemas.websocket import (
-    MessageCreate,
     MessagePublic, 
     message_schema
 )
@@ -104,12 +103,12 @@ async def get_estate_message(estate_name:str = Path(...)):
 )
 async def get_all_messages():
     messages = await Message.all()
-    if messages:
-        return messages
-    raise HTTPException(    
-        status_code=status.HTTP_204_NO_CONTENT,
-            detail="No message is available"
-        )
+    if not messages:
+        raise HTTPException(    
+            status_code=status.HTTP_404_NOT_FOUND,
+                detail="No message is available"
+            )
+    return messages
 
 
 

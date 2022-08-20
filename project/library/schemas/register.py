@@ -13,6 +13,7 @@ class UserCreate(BaseModel):
     full_name: str = Field(..., max_length=150)
     house_address: str = Field(..., max_length=150)
     estate_name: str = Field(..., max_length=150)
+    estate_id: str = Field(..., max_length=15)
     email: EmailStr
     password: str = Field(..., max_length=40, min_length=8)
 
@@ -27,6 +28,7 @@ class UserPublic(BaseModel):
     house_address: str
     estate_name: str 
     is_admin: bool
+    is_verify: bool
     email: str
 
 
@@ -47,7 +49,7 @@ class EstatePublic(BaseModel):
     estate_name: str
     public_id: str
     is_admin: bool = UserPublic
-    email: str
+    email: str = UserPublic
 
 
 

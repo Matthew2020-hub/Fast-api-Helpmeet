@@ -8,7 +8,7 @@ from fastapi_mail import ConnectionConfig
 
 config = Config(".env")
 
-cloud_name=config("cloudinary_name",  cast=Secret)
+
 api_secret=config("api_secret",  cast=Secret)
 TESTING=config("TESTING", cast=bool, default=False)
 DEBUG=config("DEBUG", cast=bool, default=False)
@@ -18,7 +18,7 @@ POSTGRES_PASSWORD=config("POSTGRES_PASSWORD", cast=Secret)
 POSTGRES_SERVER=config("POSTGRES_SERVER", cast=Secret)
 POSTGRES_PORT=config("POSTGRES_PORT", cast=Secret)
 POSTGRES_DB=config("POSTGRES_DB", cast=Secret)
-
+cloud_name=config("cloudinary_name",  cast=Secret)
 api_key=config("api_key",  cast=Secret)
 DATABASE_URL=config(
     "DATABASE_URL",
