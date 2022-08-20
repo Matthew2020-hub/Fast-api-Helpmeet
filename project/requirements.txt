@@ -25,13 +25,12 @@ black==22.3.0
 aerich==0.6.3
 redis==4.2.2
 tortoise-orm[asyncpg]==0.19.0
-
+aioredis==2.0.1
 aiosqlite==0.17.0
 anyio==3.5.0
 asgiref==3.5.
 email-validator==1.2.1
 fastapi-mail==1.1.4
-environ==1.0
 # unit/integration testing
 python-jose==3.3.0
 pytest==7.1.1
