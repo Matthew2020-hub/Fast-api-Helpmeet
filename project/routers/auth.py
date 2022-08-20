@@ -5,10 +5,13 @@ from fastapi import (
     APIRouter, 
     status, 
     Path, 
-    HTTPException
+    HTTPException,
+    Security,
 )
+from requests import Response
 from models.user import User
 from library.dependencies.utils import to_lower_case
+from library.dependencies.auth import get_current_user
 from library.schemas.register import (
     UserCreate, 
     EmailVerify,
@@ -54,7 +57,7 @@ async def user_register(data: UserCreate):
     # Converts user email to lower-case to avoid being case sensitive
     valid_email = to_lower_case(data.email)
     email_exist = await User.exists(email=valid_email)
-    if email_exist:
+    if email_exist is True:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this email already exist",
@@ -68,8 +71,6 @@ async def user_register(data: UserCreate):
     expire = datetime.now(timezone.utc) + timedelta(seconds=600)
     to_encode = {"user_id": str(created_user.id), "expire": str(expire)}
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    print(encoded_jwt)
-
     absurl = f"https://freehouses.herokuapp.com/auth/email-verify?token={encoded_jwt}"
     email_body = (
         "Hi " + " " + data.full_name + ":\n" + 
@@ -78,7 +79,7 @@ async def user_register(data: UserCreate):
     )
     message = MessageSchema(
         subject="Email Verification",
-        recipients=data.email, 
+        recipients=[data.email,], 
         body=email_body,
         subtype="html"
         )
@@ -201,7 +202,8 @@ async def forgot_password(data: ForgotPasswordSchema):
     Raises:
         HTTP_401_UNAUTHORIZED if data doesn't match any entry in the DB
     """
-    user = await User.get_or_none(email=data.email)
+    email = to_lower_case(data.email)
+    user = await User.get_or_none(email=email)
     if user is None:
         raise HTTPException(
             detail="User does not exist",
@@ -220,13 +222,13 @@ async def forgot_password(data: ForgotPasswordSchema):
     )
     message = MessageSchema(
         subject="Email Verification",
-        recipients=data.email, 
+        recipients=[data.email,], 
         body=email_body,
         subtype="html"
         )
     fm = FastMail(conf)
     await fm.send_message(message)
-    return {"message": f"Password reset link sent to {data.email}"}
+    return {"message": f"Password reset link sent to {email}"}
 
 
 @router.put(
@@ -261,18 +263,15 @@ async def password_reset(data: PasswordResetSchema, token: str = Path(...)):
             raise credentials_exception
     except JWTError as e:
         raise credentials_exception from e
-
     # Check token expiration
     if str(datetime.now(timezone.utc)) > expire:
         raise HTTPException(
             status_code=401,
             detail="Token expired or invalid!",
         )
-
     # Fetches associated user from db
     user = await User.get_or_none(id=user_id)
-
-    if not user:
+    if user is None:
         raise HTTPException(
             detail="User not found or does not exist",
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -281,7 +280,6 @@ async def password_reset(data: PasswordResetSchema, token: str = Path(...)):
     pwd_reset = await User.get(id=user.id).update(
         hashed_password=new_hashed_password
     )
-
     if not pwd_reset:
         raise HTTPException(
             detail="Password reset unsuccessful",
@@ -297,7 +295,9 @@ async def password_reset(data: PasswordResetSchema, token: str = Path(...)):
     name="auth:estate-registration",
     status_code=status.HTTP_201_CREATED,
 )
-async def estate_registration(data: EstateCreate):
+async def estate_registration(
+    data: EstateCreate,
+    ):
     """Creates a new estate
 
     Registers an estate admin object during estate registration
@@ -311,19 +311,11 @@ async def estate_registration(data: EstateCreate):
         HTTP_400_BAD_REQUEST- if email or estate name exists
     """
 
-    estate_email = data.email
+    estate_email = to_lower_case(data.email)
     # verify that estate-admin email is unique
-    verify_email_exist = await User.filter(email=estate_email).exists()
+    verify_email_exist = await User.exists(email=estate_email)
+    print(verify_email_exist)
     if verify_email_exist:
-        raise HTTPException(
-            detail = "User with this email already exist",
-            status_code = status.HTTP_400_BAD_REQUEST,
-        )
-    # verify that estate name is unique
-    verify_estate_name_exist = await Estate.filter(
-        estate_name=data.estate_name
-        ).exists()
-    if verify_estate_name_exist:
         raise HTTPException(
             detail = "User with this email already exist",
             status_code = status.HTTP_400_BAD_REQUEST,
@@ -344,4 +336,211 @@ async def estate_registration(data: EstateCreate):
             detail="Estate registration is unsuccessful",
             status_code=status.HTTP_424_FAILED_DEPENDENCY,
             )
+    expire = datetime.now(timezone.utc) + timedelta(seconds=600)
+    to_encode = {
+        "user_id": str(estate_admin_create.id), 
+        "expire": str(expire)
+        }
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    print(encoded_jwt)
+    # absurl = f"https://freehouses.herokuapp.com/auth/email-verify?token={encoded_jwt}"
+    # email_body = (
+    #     "Hi " + " " + data.full_name + ":\n" + 
+    #     "Use link below to verify your email" +
+    #     "\n" + absurl
+    # )
+    # message = MessageSchema(
+    #     subject="Email Verification",
+    #     recipients=[data.email,], 
+    #     body=email_body,
+    #     subtype="html"
+    #     )
+    # fm = FastMail(conf)
+    # await fm.send_message(message)
     return estate_create
+
+
+@router.get(
+    "/user/all/",
+    name="auth:all_users",
+    status_code=status.HTTP_200_OK,
+)
+async def get_all_user(
+    current_user=Security(get_current_user, scopes=["base"])
+    ):
+    if current_user.is_admin !=True:
+        raise HTTPException(
+            detail="Unauthorized",
+            status_code=status.HTTP_401_UNAUTHORIZED
+            )
+    return await User.all().order_by("-created_at")
+
+
+
+@router.get(
+    "/estate/all/",
+    name="auth:all_estates",
+    status_code=status.HTTP_200_OK,
+)
+async def get_all_estate(
+    current_user=Security(get_current_user, scopes=["base"])
+    ):
+    if current_user.is_admin !=True:
+        raise HTTPException(
+            detail="Unauthorized",
+            status_code=status.HTTP_401_UNAUTHORIZED
+            )
+    return await Estate.all().select_related('member').order_by("-created_at")
+
+
+
+@router.get(
+    "/user/{user_id}",
+    name="user-get",
+    status_code=status.HTTP_200_OK,
+)
+async def get_user(
+    user_id: str = Path(...),
+    current_user=Security(get_current_user, scopes=["base"]),
+):
+    """Gets a user by id
+
+    Args:
+        current_user - retrieved from login auth
+    Return:
+        HTTP_200_OK response with the user object
+    Raises:
+        HTTP_424_FAILED_DEPENDENCY if DB service fails retrieve task
+        HTTP_422_UNPROCESSABLE_ENTITY if user ID is invalid UUID type
+    """
+    try:
+        user = await User.get_or_none(id=user_id)
+    except TypeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Task ID is an Invalid UUID type.",
+        ) from e
+    if not user:
+        raise HTTPException(
+            detail="Failed to get task",
+            status_code=status.HTTP_424_FAILED_DEPENDENCY,
+        )
+    return user
+
+
+
+@router.delete(
+    "/user/{user_id}",
+    name="user-delete",
+    status_code=status.HTTP_200_OK,
+)
+async def delete_user(
+    user_id: str = Path(...),
+    current_user=Security(get_current_user, scopes=["base"]),
+):
+    """Delete a user by id
+
+    Args:
+        current_user - retrieved from login auth
+    Return:
+        HTTP_200_OK response with the user object
+    Raises:
+        HTTP_424_FAILED_DEPENDENCY if DB service fails retrieve task
+        HTTP_422_UNPROCESSABLE_ENTITY if user ID is invalid UUID type
+    """
+    if current_user.is_admin is False:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Only an admin can do this"
+        )
+    try:
+        user = await User.get_or_none(id=user_id)
+    except TypeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Task ID is an Invalid UUID type.",
+        ) from e
+    if user is None:
+        raise HTTPException(
+            detail="Failed to get user",
+            status_code=status.HTTP_424_FAILED_DEPENDENCY,
+        )
+    user.delete()
+    return "user delete is successful"
+
+
+
+
+@router.get(
+    "/estate/{estate_id}",
+    name="estate-get",
+    status_code=status.HTTP_200_OK,
+)
+async def get_estate(
+    estate_id: str = Path(...),
+    current_user=Security(get_current_user, scopes=["base"]),
+):
+    """Gets an estate by id
+
+    Args:
+        current_user - retrieved from login auth
+    Return:
+        HTTP_200_OK response with the estate object
+    Raises:
+        HTTP_424_FAILED_DEPENDENCY if DB service fails retrieve task
+        HTTP_422_UNPROCESSABLE_ENTITY if estate ID is invalid UUID type
+    """
+    try:
+        get_estate = await User.get_or_none(id=estate_id)
+    except TypeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="estate ID is an Invalid UUID type.",
+        ) from e
+    if get_estate is None:
+        raise HTTPException(
+            detail="Failed to get task",
+            status_code=status.HTTP_424_FAILED_DEPENDENCY,
+        )
+    return get_estate
+
+
+
+@router.delete(
+    "/estate/{estate_id}",
+    name="estate-delete",
+    status_code=status.HTTP_200_OK,
+)
+async def delete_estate(
+    estate_id: str = Path(...),
+    current_user=Security(get_current_user, scopes=["base"]),
+):
+    """Gets an estate by id
+
+    Args:
+        current_user - retrieved from login auth
+    Return:
+        HTTP_200_OK response with the estate object
+    Raises:
+        HTTP_424_FAILED_DEPENDENCY if DB service fails retrieve task
+        HTTP_422_UNPROCESSABLE_ENTITY if estate ID is invalid UUID type
+    """
+    if current_user.is_admin is False:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Only an admin can delete an estate"
+            )
+    try:
+        get_estate = await User.get_or_none(id=estate_id)
+    except TypeError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Estate ID is an Invalid UUID type.",
+        ) from e
+    if get_estate is None:
+        raise HTTPException(
+            detail="Estate with ID does not exist",
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    get_estate.delete()
+    return Response ("Estate delete is successful")

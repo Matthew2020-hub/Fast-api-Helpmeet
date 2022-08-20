@@ -28,7 +28,9 @@ tortoise-orm[asyncpg]==0.19.0
 aioredis==2.0.1
 aiosqlite==0.17.0
 anyio==3.5.0
-asgiref==3.5.0
+asgiref==3.5.
+email-validator==1.2.1
+fastapi-mail==1.1.4
 
 # unit/integration testing
 

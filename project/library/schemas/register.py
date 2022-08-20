@@ -23,30 +23,31 @@ class UserCreate(BaseModel):
 
 
 class UserPublic(BaseModel):
-    full_name: str = Field(..., max_length=50)
-    house_address: str = Field(..., max_length=150)
-    estate_name: str = Field(..., max_length=150)
+    full_name: str 
+    house_address: str
+    estate_name: str 
     is_admin: bool
-    email: EmailStr
+    email: str
 
 
 
 class EstateCreate(BaseModel):
     email: EmailStr
     password: str = Field(..., max_length=40, min_length=8)
-    estate_name: str = Field(..., max_length=50)
-    estate_addres: str = Field(..., max_length=50)
-    country: str = Field(..., max_length=15)
+    estate_address: str = Field(..., max_length=50)
+    estate_country: str = Field(..., max_length=15)
     estate_name: str = Field(..., max_length=150)
 
 
 
 class EstatePublic(BaseModel):
-    estate_name: str = Field(..., max_length=50)
-    estate_addres: str = Field(..., max_length=50)
-    country: str = Field(..., max_length=15)
-    estate_name: str = Field(..., max_length=150)
-    member: UserPublic
+    estate_name: str 
+    estate_address: str 
+    estate_country: str 
+    estate_name: str
+    public_id: str
+    is_admin: bool = UserPublic
+    email: str
 
 
 
