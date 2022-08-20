@@ -1,7 +1,6 @@
 from tortoise import fields
 from models.base import BaseModel
 from library.dependencies.utils import generate_short_id
-from models.user import User
 
 class Room(BaseModel):
     estate = fields.OneToOneField("models.Estate", on_delete='CASCADE')
