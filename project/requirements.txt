@@ -23,9 +23,9 @@ flake8==4.0.1
 black==22.3.0
 # database
 aerich==0.6.3
-redis==4.2.2
+
 tortoise-orm[asyncpg]==0.19.0
-aioredis==2.0.1
+
 aiosqlite==0.17.0
 anyio==3.5.0
 asgiref==3.5.
