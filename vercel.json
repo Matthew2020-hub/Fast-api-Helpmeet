@@ -1,5 +1,4 @@
 {
-    
     "builds": [
       {"src": "project/server.py", "use": "@now/python"}
     ],
@@ -7,5 +6,3 @@
       {"src": "/(.*)", "dest": "project/server.py"}
     ]
   }
-
-  
