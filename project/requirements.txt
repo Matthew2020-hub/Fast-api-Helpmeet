@@ -2,12 +2,6 @@ gunicorn==20.1.0
 fastapi==0.75.0
 pydantic==1.9.0
 requests==2.28.0
-ruamel.yaml==0.17.21
-ruamel.yaml.clib==0.2.6
-screen==1.0.1
-six==1.16.0
-sniffio==1.2.0
-sqlparse==0.4.2
 starlette==0.17.1
 typing_extensions==4.1.1
 tzdata==2022.1
@@ -26,16 +20,12 @@ black==22.3.0
 # database
 aerich==0.6.3
 tortoise-orm[asyncpg]==0.19.0
-aiosqlite==0.17.0
-anyio==3.5.0
 asgiref==3.5.
 email-validator==1.2.1
 fastapi-mail==1.1.4
 # unit/integration testing
-python-jose==3.3.0
 pytest==7.1.1
 pytest-asyncio==0.18.3
-httpx==0.22.0
 asgi-lifespan==1.0.1
 asynctest==0.13.0
 
