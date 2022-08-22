@@ -1,0 +1,44 @@
+gunicorn==20.1.0
+fastapi==0.75.0
+pydantic==1.9.0
+requests==2.28.0
+starlette==0.17.1
+typing_extensions==4.1.1
+tzdata==2022.1
+uritemplate==4.1.1
+urllib3==1.26.9
+uvicorn==0.17.6
+# server
+
+
+jinja2==3.1.1
+
+
+# code formatting
+flake8==4.0.1
+black==22.3.0
+# database
+aerich==0.6.3
+tortoise-orm[asyncpg]==0.19.0
+asgiref==3.5.
+email-validator==1.2.1
+fastapi-mail==1.1.4
+# unit/integration testing
+pytest==7.1.1
+pytest-asyncio==0.18.3
+asgi-lifespan==1.0.1
+asynctest==0.13.0
+
+# password hashing/auth
+passlib[bycrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+# pyjwt
+
+# AWS
+boto3==1.21.42
+
+# mail library
+fastapi-mail==1.1.4
+
+# websocket
+python-socketio==5.5.0
